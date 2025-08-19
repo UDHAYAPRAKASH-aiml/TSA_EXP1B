@@ -10,55 +10,65 @@ To perform regular differncing,seasonal adjustment and log transformatio on inte
 4. Plot the data according to need, before and after regular differncing,seasonal adjustment,log transformation.
 5. Display the overall results.
 ### PROGRAM:
-<b>IMPORTING PACKAGES:</b>
-```python
+```
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-%matplotlib inline
-train = pd.read_csv('Electric_Production.csv')
-train['DATE'] = pd.to_datetime(train['DATE'], format='%d/%m/%Y')
-train.head()
-```
-<b>REGULAR DIFFERENCING:</b>
-```python
-from statsmodels.tsa.stattools import adfuller
-def adf_test(timeseries):
-    print ('Results of Dickey-Fuller Test:')
-    dftest = adfuller(timeseries, autolag='AIC')
-    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic','p-value','#Lags Used'
-               ,'Number of Observations Used'])
-    for key,value in dftest[4].items():
-       dfoutput['Critical Value (%s)'%key] = value
-    print (dfoutput)
-adf_test(train['IPG2211A2N'])
-train['DATE'] = pd.to_datetime(train['DATE'], format='%d/%m/%Y')
-train['Year'] = train['DATE'].dt.year
-```
-<b>SEASONAL ADJUSTMENT:</b>
-```python
-data=train
-data['SeasonalAdjustment'] = data.iloc[:,1] - data.iloc[:,1].shift(12)
-data['SeasonalAdjustment'].dropna()
-x=data['Year']
-y=data["SeasonalAdjustment"]
-plt.plot(x,y,color='black')
-plt.title("ElectroGraph")
-plt.xlabel("<-----Year---->",color='blue')
-plt.ylabel("<-----Usage---->",color='red')
+from statsmodels.tsa.seasonal import seasonal_decompose
+### Load dataset
+data = pd.read_csv("C:\\Users\\admin\\time series\\housing_price_dataset.csv")
+# Group by YearBuilt to create a time series of average prices per year
+price_series = data.groupby("YearBuilt")["Price"].mean().reset_index()
+# Convert YearBuilt to datetime for time series analysis
+price_series['YearBuilt'] = pd.to_datetime(price_series['YearBuilt'], format='%Y')
+price_series.set_index('YearBuilt', inplace=True)
+# Original series
+series = price_series['Price']
+# 1. Regular Differencing
+price_series['diff'] = series - series.shift(1)
+# 2. Log Transformation
+price_series['log'] = np.log(series)
+# 3. Log Differencing
+price_series['log_diff'] = price_series['log'] - price_series['log'].shift(1)
+# 4. Seasonal Decomposition (using log transformed data)
+result = seasonal_decompose(price_series['log'].dropna(), model='additive', period=5)
+# 5. Seasonal Differencing
+price_series['log_seasonal_diff'] = price_series['log_diff'] - price_series['log_diff'].shift(5)
+# ---- Plotting ----
+plt.figure(figsize=(16, 16))
+plt.subplot(6, 1, 1)
+plt.plot(series, label='Original')
+plt.legend(loc='best')
+plt.title('Original Data (Average Price per Year)')
+plt.subplot(6, 1, 2)
+plt.plot(price_series['diff'], label='Regular Difference')
+plt.legend(loc='best')
+plt.title('Regular Differencing')
+
+plt.subplot(6, 1, 3)
+plt.plot(result.trend, label='Trend (Decomposition)')
+plt.legend(loc='best')
+plt.title('Trend (from Seasonal Decomposition)')
+
+plt.subplot(6, 1, 4)
+plt.plot(price_series['log'], label='Log Transformation')
+plt.legend(loc='best')
+plt.title('Log Transformation')
+
+plt.subplot(6, 1, 5)
+plt.plot(price_series['log_diff'], label='Log Differencing')
+plt.legend(loc='best')
+plt.title('Log Transformation + Differencing')
+
+plt.subplot(6, 1, 6)
+plt.plot(price_series['log_seasonal_diff'], label='Log + Differencing + Seasonal Differencing')
+plt.legend(loc='best')
+plt.title('Log + Regular + Seasonal Differencing')
+
+plt.tight_layout()
 plt.show()
-```
-<b>LOG TRANSFORMATION:</b>
-```python
-data1=train
-data1['log']=np.log(data1['IPG2211A2N_diff']).dropna()
-data1=data1.dropna()
-x=data1['Year']
-y=data1['log']
-plt.xlabel('Year',color='blue')
-plt.ylabel('Log Values',color='red')
-```
 ### OUTPUT:
+```
 <img width="1463" height="722" alt="Screenshot (163)" src="https://github.com/user-attachments/assets/8a7d9fa9-6cd3-42c6-a510-93e05b744266" />
 
 <img width="1409" height="693" alt="Screenshot (164)" src="https://github.com/user-attachments/assets/22fd6638-b3d7-4c35-a07a-b19db0d4f141" />
