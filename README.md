@@ -59,18 +59,13 @@ plt.xlabel('Year',color='blue')
 plt.ylabel('Log Values',color='red')
 ```
 ### OUTPUT:
+<img width="1463" height="722" alt="Screenshot (163)" src="https://github.com/user-attachments/assets/8a7d9fa9-6cd3-42c6-a510-93e05b744266" />
 
-<b>REGULAR DIFFERENCING:</b>
+<img width="1409" height="693" alt="Screenshot (164)" src="https://github.com/user-attachments/assets/22fd6638-b3d7-4c35-a07a-b19db0d4f141" />
 
-![image](https://github.com/Pavan-Gv/TSA_EXP1B/assets/94827772/0ac0763a-5c24-4edf-a629-c0bca584620b)
 
-<b>SEASONAL ADJUSTMENT:</b>
 
-![image](https://github.com/Pavan-Gv/TSA_EXP1B/assets/94827772/e121a175-edfc-4cdd-bddd-db6dca44f5d0)
 
-<b>LOG TRANSFORMATION:</b>
 
-![image](https://github.com/Pavan-Gv/TSA_EXP1B/assets/94827772/dcfa8245-c1b6-4358-ba2f-44f5e029d38f)
 
-### RESULT:
 Thus we have created the python code for the conversion of non stationary to stationary data on international airline passenger data.
